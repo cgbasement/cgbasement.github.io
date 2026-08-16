@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>须臾｜产业数字化服务体系</title>
+  <style>
+    :root {
+      --navy-950:#061521;
+      --navy-900:#0a1e2e;
+      --navy-800:#102f43;
+      --paper:#f5f8fb;
+      --ink:#10283a;
+      --muted:#668092;
+      --line:#d9e4eb;
+      --cyan:#4bd2c9;
+      --blue:#4a9eee;
+      --orange:#f59a48;
+      --yellow:#ffd166;
+      --purple:#b77bec;
+      --white:#fff;
+      --shadow:0 24px 70px rgba(0,0,0,.22);
+      --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",Inter,Arial,sans-serif;
+    }
+
+    * { box-sizing:border-box; }
+    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#030a10; font-family:var(--font); }
+    button { font:inherit; }
+
+    .stage {
+      position:fixed;
+      inset:0;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(75,210,201,.12), transparent 26%),
+        radial-gradient(circle at 85% 90%, rgba(74,158,238,.10), transparent 30%),
+        #030a10;
+    }
+
+    .deck {
+      position:relative;
+      width:min(100vw, calc(100vh * 16 / 9));
+      height:min(100vh, calc(100vw * 9 / 16));
+      overflow:hidden;
+      background:var(--navy-950);
+      box-shadow:var(--shadow);
+      isolation:isolate;
+    }
+
+    .slide {
+      position:absolute;
+      inset:0;
+      opacity:0;
+      visibility:hidden;
+      transform:translateX(3%);
+      transition:opacity .38s ease, transform .38s ease, visibility .38s;
+      padding:5.5% 6.3% 5.2%;
+      overflow:hidden;
+    }
+    .slide.active { opacity:1; visibility:visible; transform:none; z-index:2; }
+    .slide.dark {
+      color:var(--white);
+      background:
+        radial-gradient(circle at 90% 10%, rgba(75,210,201,.12), transparent 28%),
+        radial-gradient(circle at 12% 100%, rgba(74,158,238,.10), transparent 34%),
+        linear-gradient(135deg, #071724, #0b2c40 65%, #0b5052);
+    }
+    .slide.light { color:var(--ink); background:var(--paper); }
+    .slide.scope-slide::after {
+      content:"";
+      position:absolute;
+      width:34%; aspect-ratio:1;
+      right:-18%; top:-28%;
+      border-radius:50%;
+      background:rgba(75,210,201,.08);
+      z-index:-1;
+    }
+
+    .kicker { font-size:clamp(10px,1.15vw,20px); font-weight:800; letter-spacing:.16em; color:var(--cyan); text-transform:uppercase; }
+    .light .kicker { color:#158b91; }
+    h1,h2,h3,p { margin:0; }
+    h1 { font-size:clamp(34px,5.3vw,88px); line-height:1.04; letter-spacing:-.04em; }
+    h2 { font-size:clamp(26px,3.15vw,54px); line-height:1.12; letter-spacing:-.035em; }
+    h3 { font-size:clamp(16px,1.55vw,27px); line-height:1.2; }
+    p,li { font-size:clamp(12px,1.17vw,21px); line-height:1.55; }
+    .subtitle { max-width:72%; color:#bad2dd; font-size:clamp(14px,1.48vw,26px); line-height:1.48; }
+    .light .subtitle { color:var(--muted); }
+    .accent-line { width:11%; height:5px; border-radius:999px; background:linear-gradient(90deg,var(--orange),var(--yellow)); }
+    .topline { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+    .page-no { font-size:clamp(10px,.92vw,16px); font-weight:800; color:rgba(255,255,255,.48); letter-spacing:.08em; }
+    .light .page-no { color:#8aa0ae; }
+    .section-head { display:flex; flex-direction:column; gap:10px; margin-bottom:3.3%; }
+    .section-head .subtitle { max-width:82%; }
+
+    .footer {
+      position:absolute;
+      left:6.3%; right:6.3%; bottom:2.4%;
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:clamp(8px,.7vw,12px); font-weight:700; letter-spacing:.08em;
+      color:rgba(255,255,255,.45);
+    }
+    .light .footer { color:#8195a2; }
+
+    .cover { display:grid; grid-template-columns:1.32fr .68fr; gap:5%; align-items:center; }
+    .cover-copy { display:flex; flex-direction:column; gap:24px; }
+    .cover h1 span { color:var(--cyan); }
+    .brand-lock { display:inline-grid; grid-template-columns:auto auto; grid-template-rows:auto auto; column-gap:13px; align-items:center; width:max-content; }
+    .brand-lock strong { grid-row:1 / 3; font-size:clamp(20px,1.8vw,31px); letter-spacing:.12em; }
+    .brand-lock span { font-size:clamp(9px,.82vw,14px); color:#a8c3cf; font-weight:800; letter-spacing:.12em; }
+    .brand-lock .brand-bars { display:flex; gap:4px; align-items:center; margin-top:4px; }
+    .brand-lock i { display:block; width:22px; height:3px; border-radius:999px; background:var(--bar); }
+    .cover-rail { position:relative; height:72%; display:flex; flex-direction:column; justify-content:space-between; }
+    .cover-rail::before { content:""; position:absolute; left:18px; top:22px; bottom:22px; width:3px; background:linear-gradient(#4a9eee,#b77bec,#4bd2c9,#f59a48); opacity:.82; }
+    .rail-item { position:relative; margin-left:56px; }
+    .rail-item::before { content:""; position:absolute; left:-49px; top:4px; width:18px; height:18px; border-radius:50%; background:var(--cyan); border:3px solid rgba(255,255,255,.8); }
+    .rail-item:nth-child(2)::before { background:var(--blue); }
+    .rail-item:nth-child(3)::before { background:var(--purple); }
+    .rail-item:nth-child(4)::before { background:var(--orange); }
+    .rail-item strong { display:block; font-size:clamp(15px,1.5vw,26px); }
+    .rail-item small { color:#9bb9c7; font-size:clamp(10px,.95vw,16px); }
+    .confidential { display:inline-flex; align-items:center; gap:8px; width:max-content; padding:8px 13px; border:1px solid rgba(255,255,255,.2); border-radius:999px; color:#b7ccd7; font-size:clamp(9px,.8vw,13px); font-weight:700; }
+
+    .layer-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.7%; height:68%; }
+    .layer-card { position:relative; border-radius:22px; padding:8% 7%; overflow:hidden; border:1px solid rgba(16,47,67,.08); box-shadow:0 14px 34px rgba(20,56,80,.08); }
+    .layer-card::after { content:""; position:absolute; height:8px; left:0; right:0; bottom:0; background:var(--accent); }
+    .layer-card .index { width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--accent); color:white; font-size:14px; font-weight:900; margin-bottom:16%; }
+    .layer-card h3 { margin-bottom:8%; }
+    .layer-card h3 span { display:block; margin-top:7px; color:var(--accent); font-size:clamp(11px,.92vw,16px); font-weight:800; letter-spacing:.02em; }
+    .layer-card p { color:var(--muted); font-size:clamp(10px,.98vw,17px); }
+    .layer-card .label { position:absolute; bottom:8%; font-size:clamp(9px,.76vw,13px); font-weight:800; color:var(--accent); letter-spacing:.06em; }
+
+    .process { display:grid; grid-template-columns:repeat(6,1fr); gap:1.2%; align-items:center; margin-top:4.5%; }
+    .process-step { position:relative; min-height:176px; border-radius:16px; padding:13% 11% 10%; background:white; border:1px solid var(--line); box-shadow:0 10px 28px rgba(20,56,80,.08); }
+    .process-step:not(:last-child)::after { content:"→"; position:absolute; right:-11%; top:44%; color:#8aa8b8; font-weight:900; font-size:clamp(14px,1.5vw,26px); z-index:2; }
+    .process-step .num { font-size:clamp(22px,2.6vw,45px); color:#dce8ee; font-weight:900; line-height:1; margin-bottom:16%; }
+    .process-step h3 { margin-bottom:9%; }
+    .process-step p { color:var(--muted); font-size:clamp(9px,.83vw,14px); }
+
+    .platform-map { display:grid; grid-template-columns:1fr 1.08fr; gap:5%; align-items:center; height:68%; }
+    .hub { position:relative; height:100%; display:grid; place-items:center; }
+    .hub-center { width:36%; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; text-align:center; background:linear-gradient(135deg,var(--cyan),var(--blue)); color:white; font-size:clamp(15px,1.5vw,26px); font-weight:900; box-shadow:0 18px 44px rgba(39,183,190,.25); z-index:2; }
+    .orbit { position:absolute; inset:9%; border:1px dashed #a7beca; border-radius:50%; }
+    .orbit-item { position:absolute; width:29%; min-height:23%; display:grid; place-items:center; text-align:center; border-radius:16px; background:white; border:1px solid var(--line); padding:3%; color:var(--ink); font-size:clamp(10px,.9vw,16px); font-weight:800; box-shadow:0 10px 24px rgba(20,56,80,.08); }
+    .oi1{top:3%;left:35.5%}.oi2{right:0;top:38%}.oi3{bottom:3%;left:35.5%}.oi4{left:0;top:38%}
+    .benefits { display:grid; align-content:center; }
+    .benefit { display:grid; grid-template-columns:auto 1fr; gap:4%; align-items:start; padding:5% 2%; border-top:1px solid var(--line); background:transparent; }
+    .benefit:first-child { border-top:0; }
+    .benefit .big { font-size:clamp(20px,2.3vw,40px); font-weight:900; color:#198d94; line-height:1; }
+    .benefit p { color:var(--muted); font-size:clamp(10px,.95vw,16px); }
+
+    .ai-flow { display:grid; grid-template-columns:repeat(4,1fr); gap:2%; align-items:stretch; height:56%; margin-top:3%; }
+    .ai-step { position:relative; border-radius:22px; padding:9% 7%; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); }
+    .ai-step:not(:last-child)::after { content:""; position:absolute; top:50%; right:-8%; width:10%; height:3px; background:var(--cyan); }
+    .ai-step .icon { width:48px; height:48px; border-radius:14px; display:grid; place-items:center; color:white; background:var(--accent); font-weight:900; margin-bottom:13%; }
+    .ai-step h3 { margin-bottom:8%; }
+    .ai-step p { color:#b8d1dc; font-size:clamp(10px,.95vw,16px); }
+    .callout { margin-top:3%; padding:1.6% 2.2%; border-radius:14px; background:rgba(245,154,72,.13); border:1px solid rgba(245,154,72,.36); color:#ffe0bc; font-size:clamp(11px,1.03vw,18px); font-weight:700; }
+
+    .infra { display:grid; gap:2.2%; margin-top:2.8%; }
+    .infra-row { position:relative; display:grid; grid-template-columns:18% 1fr 27%; align-items:center; gap:2%; padding:2.2% 2.8%; border-radius:18px; border:1px solid rgba(255,255,255,.13); background:rgba(255,255,255,.065); }
+    .infra-row:not(:last-child)::after { content:"↓"; position:absolute; left:49%; bottom:-26%; color:var(--cyan); font-size:clamp(16px,1.8vw,30px); font-weight:900; z-index:3; }
+    .infra-row h3 { color:var(--accent); }
+    .infra-row p { color:#c2d7e0; font-size:clamp(10px,.92vw,16px); }
+    .infra-row .promise { justify-self:end; text-align:right; color:#fff; font-size:clamp(10px,.88vw,15px); font-weight:800; }
+
+    .map-wrap { position:absolute; left:6.3%; right:6.3%; top:3.3%; bottom:7%; display:grid; place-items:center; }
+    .map-wrap img { width:100%; height:auto; max-height:100%; object-fit:contain; border-radius:18px; box-shadow:0 18px 52px rgba(0,0,0,.18); }
+
+    .case-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2%; height:62%; }
+    .case-card { border-radius:22px; padding:7%; background:white; border:1px solid var(--line); box-shadow:0 12px 34px rgba(20,56,80,.08); display:flex; flex-direction:column; }
+    .case-card .case-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10%; }
+    .case-card .badge { padding:6px 10px; border-radius:999px; background:var(--tint); color:var(--accent); font-size:clamp(9px,.72vw,12px); font-weight:900; }
+    .case-card p { color:var(--muted); font-size:clamp(10px,.91vw,16px); }
+    .case-card ul { list-style:none; padding:0; margin:auto 0 0; display:grid; gap:8px; }
+    .case-card li { position:relative; padding-left:18px; color:var(--ink); font-size:clamp(10px,.84vw,14px); font-weight:700; }
+    .case-card li::before { content:""; position:absolute; left:0; top:.62em; width:7px; height:7px; border-radius:50%; background:var(--accent); }
+    .customer-strip { display:flex; gap:1%; flex-wrap:wrap; margin-top:2.4%; }
+    .customer-strip span { padding:.65% 1.15%; background:#eaf2f6; border:1px solid #d2e0e7; border-radius:999px; font-size:clamp(9px,.76vw,13px); font-weight:800; color:#456173; }
+
+    .success-slide .section-head { gap:7px; margin-bottom:2.2%; }
+    .success-slide h2 { font-size:clamp(25px,2.82vw,48px); }
+    .success-slide .subtitle { max-width:88%; font-size:clamp(13px,1.24vw,22px); }
+    .success-grid { display:grid; grid-template-columns:.9fr 1.1fr; gap:2.6%; height:59%; }
+    .success-narrative { display:grid; grid-template-rows:repeat(3,1fr); padding:2.5% 4%; border-radius:22px; background:white; border:1px solid var(--line); box-shadow:0 12px 32px rgba(20,56,80,.08); }
+    .story-block { position:relative; padding:5.8% 4% 5.2% 13%; background:transparent; }
+    .story-block:not(:last-child) { border-bottom:1px solid var(--line); }
+    .story-block::before { content:attr(data-step); position:absolute; left:3.5%; top:30%; width:27px; height:27px; display:grid; place-items:center; border-radius:9px; color:white; background:var(--accent); font-size:clamp(9px,.7vw,12px); font-weight:900; }
+    .story-block h3 { color:var(--accent); margin-bottom:2.2%; font-size:clamp(13px,1.16vw,20px); }
+    .story-block p { color:var(--muted); font-size:clamp(10px,.84vw,15px); line-height:1.45; }
+    .result-panel { border-radius:22px; padding:4.2%; color:white; background:linear-gradient(145deg,#0b2a3d,#0d5a5a); box-shadow:0 18px 42px rgba(9,54,69,.2); display:flex; flex-direction:column; }
+    .result-label { display:inline-flex; width:max-content; padding:6px 10px; border-radius:999px; color:#d7fffb; background:rgba(75,210,201,.14); border:1px solid rgba(75,210,201,.36); font-size:clamp(9px,.72vw,12px); font-weight:900; letter-spacing:.08em; }
+    .result-panel h3 { margin:3.4% 0 4%; font-size:clamp(16px,1.46vw,25px); }
+    .result-metrics { display:grid; grid-template-columns:repeat(2,1fr); gap:3%; flex:1; }
+    .result-metric { padding:8% 7%; border-radius:16px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); }
+    .result-metric strong { display:block; color:var(--cyan); font-size:clamp(26px,3.25vw,56px); line-height:.95; letter-spacing:-.045em; }
+    .result-metric span { display:block; color:#c8dce4; margin-top:7%; font-size:clamp(9px,.78vw,14px); font-weight:700; }
+
+    .decision-grid { display:grid; grid-template-columns:.83fr 1.17fr; gap:3.2%; height:61%; }
+    .decision-path { display:grid; grid-template-rows:auto repeat(3,1fr); gap:3%; }
+    .decision-claim { padding:4.5%; border-left:5px solid var(--purple); background:rgba(183,123,236,.1); border-radius:0 16px 16px 0; color:#dcc9ee; font-size:clamp(11px,.98vw,17px); font-weight:800; }
+    .decision-node { position:relative; display:grid; grid-template-columns:27% 1fr; align-items:center; gap:4%; padding:4%; border-radius:16px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); }
+    .decision-node:not(:last-child)::after { content:"↓"; position:absolute; left:12%; bottom:-23%; color:var(--purple); font-weight:900; z-index:2; }
+    .decision-node strong { color:#c997f1; font-size:clamp(11px,1vw,17px); }
+    .decision-node p { color:#bcd1da; font-size:clamp(9px,.82vw,14px); line-height:1.4; }
+    .proof-board { display:grid; grid-template-columns:repeat(2,1fr); gap:3%; }
+    .proof-card { padding:8%; border-radius:20px; background:rgba(255,255,255,.075); border:1px solid rgba(255,255,255,.14); display:flex; flex-direction:column; justify-content:center; }
+    .proof-card .proof-value { color:var(--accent); font-size:clamp(34px,4.6vw,78px); line-height:.9; font-weight:900; letter-spacing:-.055em; }
+    .proof-card h3 { margin-top:8%; font-size:clamp(13px,1.16vw,20px); }
+    .proof-card p { margin-top:3%; color:#afc8d3; font-size:clamp(9px,.78vw,13px); line-height:1.4; }
+
+    .reuse-layout { display:grid; grid-template-columns:.42fr 1.58fr; gap:3%; height:61%; }
+    .reuse-score { border-radius:24px; padding:8%; color:white; background:linear-gradient(150deg,#0b2c40,#168f95); display:flex; flex-direction:column; justify-content:center; box-shadow:0 18px 42px rgba(9,54,69,.18); }
+    .reuse-score .big { color:var(--cyan); font-size:clamp(70px,9vw,150px); font-weight:900; line-height:.8; letter-spacing:-.07em; }
+    .reuse-score h3 { margin-top:12%; }
+    .reuse-score p { margin-top:5%; color:#c2d9e1; font-size:clamp(10px,.88vw,15px); }
+    .reuse-cases { display:grid; grid-template-rows:repeat(3,1fr); gap:3%; }
+    .reuse-case { display:grid; grid-template-columns:19% 33% 1fr; gap:3%; align-items:center; padding:3.4% 4%; border-radius:18px; background:white; border:1px solid var(--line); box-shadow:0 10px 26px rgba(20,56,80,.07); }
+    .reuse-case h3 { color:var(--accent); }
+    .reuse-case strong { font-size:clamp(10px,.9vw,15px); color:var(--ink); }
+    .reuse-case p { color:var(--muted); font-size:clamp(9px,.78vw,13px); line-height:1.4; }
+    .value-banner { margin-top:2.1%; display:grid; grid-template-columns:auto 1fr auto; gap:2%; align-items:center; padding:1.3% 1.8%; background:#e9f4f3; border-left:5px solid #168f95; border-radius:0 14px 14px 0; }
+    .value-banner strong { color:#168f95; font-size:clamp(10px,.86vw,15px); }
+    .value-banner span { color:#526d7d; font-size:clamp(9px,.78vw,13px); font-weight:700; }
+    .value-banner em { color:#7a909d; font-size:clamp(8px,.68vw,12px); font-style:normal; }
+
+    .llyy { display:grid; grid-template-columns:.86fr 1.14fr; gap:5%; height:66%; align-items:center; }
+    .llyy-copy { display:flex; flex-direction:column; gap:6%; }
+    .llyy-copy .quote { padding:5%; border-left:5px solid var(--purple); background:rgba(183,123,236,.09); border-radius:0 16px 16px 0; color:#d9c1ee; }
+    .llyy-flow { display:grid; gap:3%; }
+    .flow-node { display:grid; grid-template-columns:22% 1fr; align-items:center; gap:4%; padding:3.5%; border-radius:16px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); }
+    .flow-node:not(:last-child) { position:relative; }
+    .flow-node:not(:last-child)::after { content:"↓"; position:absolute; left:11%; bottom:-26px; color:var(--purple); font-weight:900; }
+    .flow-node strong { color:var(--purple); font-size:clamp(12px,1.05vw,18px); }
+    .flow-node p { color:#c0d4de; font-size:clamp(10px,.92vw,16px); }
+
+    .metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:3%; margin-top:4%; }
+    .metric-card { min-height:270px; border-radius:24px; padding:8%; background:rgba(255,255,255,.075); border:1px solid rgba(255,255,255,.14); display:flex; flex-direction:column; justify-content:center; text-align:center; }
+    .metric-card .value { font-size:clamp(56px,7vw,118px); font-weight:900; line-height:.9; color:var(--accent); letter-spacing:-.06em; }
+    .metric-card h3 { margin-top:8%; }
+    .metric-card p { margin-top:4%; color:#abc5d1; font-size:clamp(10px,.92vw,16px); }
+    .metric-note { text-align:center; color:#b9d2dc; margin-top:3%; font-size:clamp(10px,.95vw,16px); }
+
+    .moat { position:relative; height:68%; display:grid; place-items:center; }
+    .moat-center { width:19%; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; text-align:center; background:var(--navy-900); color:white; font-size:clamp(15px,1.4vw,24px); font-weight:900; z-index:2; box-shadow:0 16px 38px rgba(0,0,0,.18); }
+    .moat-card { position:absolute; width:34%; min-height:32%; border-radius:20px; padding:3.2%; background:white; border:1px solid var(--line); box-shadow:0 10px 28px rgba(20,56,80,.08); }
+    .moat-card h3 { color:var(--accent); margin-bottom:4%; }
+    .moat-card p { color:var(--muted); font-size:clamp(10px,.92vw,16px); }
+    .mc1{top:2%;left:3%}.mc2{top:2%;right:3%}.mc3{bottom:2%;left:3%}.mc4{bottom:2%;right:3%}
+    .moat-line { position:absolute; width:21%; height:2px; background:#b5c7d1; transform-origin:left center; }
+    .ml1{left:35%;top:33%;transform:rotate(24deg)}.ml2{left:54%;top:41%;transform:rotate(-24deg)}.ml3{left:35%;top:66%;transform:rotate(-24deg)}.ml4{left:54%;top:58%;transform:rotate(24deg)}
+
+    .closing { display:grid; grid-template-columns:1.1fr .9fr; gap:6%; align-items:center; }
+    .closing-copy { display:flex; flex-direction:column; gap:24px; }
+    .closing h1 { font-size:clamp(34px,4.25vw,72px); }
+    .closing-list { display:grid; gap:4%; }
+    .closing-item { display:grid; grid-template-columns:46px 1fr; gap:4%; align-items:center; }
+    .closing-item .n { width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--cyan); color:var(--navy-950); font-weight:900; }
+    .closing-item:last-child .n { background:var(--orange); color:white; }
+    .closing-item strong { font-size:clamp(13px,1.2vw,21px); }
+    .closing-item small { display:block; color:#a9c3cf; font-size:clamp(9px,.82vw,14px); margin-top:2px; }
+
+    /* Signature visual system: four semantic layers, used only where structure is real. */
+    .capability-stack { height:66%; margin-top:.6%; display:grid; grid-template-rows:1.28fr repeat(3,1fr); gap:10px; perspective:1200px; }
+    .stack-layer { position:relative; display:grid; grid-template-columns:24% 1fr auto; align-items:center; gap:3%; padding:0 3.2%; margin-left:var(--offset); margin-right:calc(0% - var(--offset)); border-radius:14px; color:var(--ink); background:var(--surface); border:1px solid color-mix(in srgb,var(--accent) 26%, white); box-shadow:0 13px 26px rgba(20,56,80,.07); }
+    .stack-layer::before { content:""; position:absolute; left:0; top:0; bottom:0; width:8px; border-radius:14px 0 0 14px; background:var(--accent); }
+    .stack-name { display:flex; align-items:baseline; gap:13px; }
+    .stack-name strong { font-size:clamp(19px,2vw,34px); letter-spacing:-.03em; }
+    .stack-name span { color:var(--accent); font-size:clamp(10px,.85vw,15px); font-weight:850; }
+    .stack-layer p { color:var(--muted); font-size:clamp(10px,.94vw,16px); }
+    .stack-outcome { padding:7px 11px; border-radius:999px; background:white; color:var(--accent); font-size:clamp(9px,.76vw,13px); font-weight:850; white-space:nowrap; }
+    .stack-layer.ai-core { color:white; background:linear-gradient(110deg,#0b2c40,#12656a); border-color:rgba(75,210,201,.52); box-shadow:0 16px 38px rgba(18,101,106,.24); }
+    .stack-layer.ai-core p { color:#d5e8ed; }
+    .stack-layer.ai-core .stack-name span { color:#76e4dc; }
+    .stack-layer.ai-core .stack-outcome { color:#0b5d61; background:#c9f6f1; }
+
+    .ai-throughline { margin-top:3%; display:grid; grid-template-columns:auto 1fr auto; gap:2%; align-items:center; padding:1.35% 1.8%; border-radius:14px; color:white; background:linear-gradient(100deg,#0b2c40,#12656a); box-shadow:0 12px 30px rgba(18,101,106,.16); }
+    .ai-throughline strong { color:var(--cyan); font-size:clamp(11px,1vw,17px); }
+    .ai-throughline span { font-size:clamp(9px,.78vw,13px); font-weight:750; }
+    .ai-throughline em { color:#a7cbd3; font-size:clamp(8px,.68vw,12px); font-style:normal; font-weight:850; letter-spacing:.08em; }
+
+    .data-pipeline { position:relative; height:58%; margin-top:2%; display:grid; grid-template-columns:repeat(4,1fr); gap:3%; align-items:center; }
+    .data-pipeline::before { content:""; position:absolute; left:7%; right:7%; top:31%; height:8px; border-radius:999px; background:linear-gradient(90deg,#247fc2,#665bd8,#18a88e,#e9822b); box-shadow:0 0 28px rgba(75,210,201,.24); }
+    .pipe-stage { position:relative; z-index:1; align-self:stretch; display:grid; grid-template-rows:44% auto 1fr; justify-items:center; text-align:center; }
+    .pipe-node { align-self:end; width:92px; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; background:var(--navy-900); border:8px solid var(--accent); box-shadow:0 14px 34px rgba(0,0,0,.22); }
+    .pipe-node svg { width:42%; height:42%; stroke:white; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .pipe-stage h3 { margin-top:13%; }
+    .pipe-stage p { max-width:88%; margin-top:5%; color:#b8d1dc; font-size:clamp(10px,.9vw,15px); }
+    .pipeline-result { margin-top:1%; display:grid; grid-template-columns:auto 1fr auto; gap:2%; align-items:center; padding:1.5% 2%; border-top:1px solid rgba(245,154,72,.48); color:#ffe0bc; }
+    .pipeline-result strong { color:var(--orange); font-size:clamp(11px,1.05vw,18px); }
+    .pipeline-result span { font-size:clamp(10px,.9vw,16px); font-weight:700; }
+    .pipeline-result em { color:#a9c4cf; font-size:clamp(9px,.75vw,13px); font-style:normal; }
+
+    .network-architecture { height:63%; margin-top:.6%; display:grid; grid-template-columns:1.42fr .58fr; gap:3%; }
+    .pyramid-stack { display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:7px; }
+    .pyramid-layer { height:22%; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:0 6%; text-align:center; color:white; clip-path:polygon(8% 0,92% 0,100% 100%,0 100%); box-shadow:0 14px 30px rgba(0,0,0,.18); }
+    .pyramid-layer:nth-child(1) { width:48%; background:linear-gradient(100deg,#168f95,#52d3c6); }
+    .pyramid-layer:nth-child(2) { width:66%; background:linear-gradient(100deg,#176fb5,#4a9eee); }
+    .pyramid-layer:nth-child(3) { width:84%; background:linear-gradient(100deg,#5144be,#806bd6); }
+    .pyramid-layer:nth-child(4) { width:100%; background:linear-gradient(100deg,#c7651c,#f2a65a); }
+    .pyramid-layer h3 { font-size:clamp(13px,1.22vw,21px); }
+    .pyramid-layer p { margin-top:1.5%; color:rgba(255,255,255,.82); font-size:clamp(9px,.72vw,12px); font-weight:700; }
+    .pyramid-layer span { margin-bottom:1%; color:rgba(255,255,255,.68); font-size:clamp(7px,.58vw,10px); font-weight:900; letter-spacing:.14em; }
+    .network-control { padding:9% 8%; border:1px solid rgba(255,255,255,.16); border-radius:22px; background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(82,211,198,.06)); display:flex; flex-direction:column; }
+    .network-control .control-key { color:var(--cyan); font-size:clamp(8px,.68vw,12px); font-weight:900; letter-spacing:.14em; }
+    .network-control h3 { margin-top:6%; font-size:clamp(20px,2vw,34px); }
+    .network-control > p { margin-top:5%; color:#b9d0da; font-size:clamp(9px,.8vw,14px); }
+    .control-list { margin-top:auto; display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .control-list span { min-height:54px; padding:10%; border-left:3px solid var(--cyan); background:rgba(255,255,255,.055); color:#d7e7ec; font-size:clamp(9px,.76vw,13px); font-weight:800; }
+    .network-principle { margin-top:1%; display:grid; grid-template-columns:auto 1fr auto; gap:2%; align-items:center; padding:1.35% 1.8%; border-top:1px solid rgba(82,211,198,.35); color:#cfe3e8; }
+    .network-principle strong { color:var(--cyan); font-size:clamp(11px,1vw,17px); }
+    .network-principle span { font-size:clamp(9px,.8vw,14px); font-weight:750; }
+    .network-principle em { color:#f3bd85; font-size:clamp(8px,.68vw,12px); font-style:normal; font-weight:850; letter-spacing:.08em; }
+
+    .evidence-grid { display:grid; grid-template-columns:.72fr 1.28fr; gap:3%; height:61%; }
+    .story-rail { display:grid; grid-template-rows:repeat(3,1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    .story-point { position:relative; padding:6% 3% 5% 17%; border-bottom:1px solid var(--line); }
+    .story-point:last-child { border-bottom:0; }
+    .story-point::before { content:attr(data-step); position:absolute; left:2%; top:20%; color:var(--accent); font-size:clamp(20px,2.1vw,36px); font-weight:900; }
+    .story-point h3 { color:var(--accent); margin-bottom:3%; font-size:clamp(13px,1.16vw,20px); }
+    .story-point p { color:var(--muted); font-size:clamp(10px,.84vw,15px); }
+    .product-evidence { display:grid; grid-template-rows:48% 1fr; border-radius:20px; overflow:hidden; border:1px solid var(--line); background:white; box-shadow:0 16px 38px rgba(20,56,80,.11); }
+    .product-shot { position:relative; overflow:hidden; background:#edf2fa; }
+    .product-shot img { width:100%; height:100%; object-fit:cover; object-position:center 44%; filter:saturate(.82) contrast(.98); }
+    .product-shot::after { content:"脱敏后的已交付产品界面"; position:absolute; left:18px; bottom:14px; padding:6px 10px; border-radius:999px; background:rgba(6,21,33,.78); color:white; font-size:clamp(8px,.68vw,12px); font-weight:800; }
+    .product-shot.mode-proof { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); }
+    .product-shot.mode-proof::after { content:none; }
+    .mode-proof span { display:flex; flex-direction:column; justify-content:center; padding:6% 10%; background:linear-gradient(135deg,#102f43,#15505a); color:white; }
+    .mode-proof i { color:#82d9d4; font-size:clamp(8px,.66vw,11px); font-style:normal; font-weight:850; letter-spacing:.12em; }
+    .mode-proof strong { margin-top:3%; font-size:clamp(12px,1.12vw,19px); }
+    .evidence-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); }
+    .evidence-metric { background:white; padding:12% 9%; display:flex; flex-direction:column; justify-content:center; }
+    .evidence-metric strong { color:#168f95; font-size:clamp(23px,2.55vw,44px); line-height:.95; letter-spacing:-.04em; }
+    .evidence-metric span { margin-top:8%; color:var(--muted); font-size:clamp(8px,.7vw,12px); font-weight:750; }
+
+    .analysis-case { display:grid; grid-template-columns:.88fr 1.12fr; gap:4%; height:61%; }
+    .cost-proof { position:relative; display:flex; flex-direction:column; justify-content:center; padding:4% 7%; border-left:7px solid var(--orange); }
+    .cost-proof .proof-value { color:var(--orange); font-size:clamp(78px,10vw,168px); line-height:.8; font-weight:950; letter-spacing:-.07em; }
+    .cost-proof h3 { margin-top:7%; font-size:clamp(18px,1.8vw,31px); }
+    .cost-proof p { margin-top:4%; color:#b8cfd9; font-size:clamp(10px,.92vw,16px); }
+    .cost-proof .source-line { margin-top:9%; display:flex; align-items:center; gap:10px; color:#92afbc; font-size:clamp(9px,.74vw,13px); font-weight:750; }
+    .source-line i { width:34px; height:2px; background:var(--orange); }
+    .report-evidence { display:grid; grid-template-rows:auto 1fr; gap:4%; }
+    .integration-line { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:2%; align-items:center; }
+    .integration-line span { padding:9px 12px; text-align:center; border-top:2px solid var(--purple); color:#d9c4ec; font-size:clamp(9px,.75vw,13px); font-weight:800; }
+    .integration-line b { color:var(--purple); }
+    .report-sheet { padding:6%; color:var(--ink); background:#f7fafc; border-radius:6px 20px 20px 6px; box-shadow:0 20px 48px rgba(0,0,0,.22); display:grid; grid-template-rows:auto 1fr; }
+    .report-sheet header { display:flex; justify-content:space-between; align-items:start; padding-bottom:4%; border-bottom:1px solid #d9e4eb; }
+    .report-sheet header strong { font-size:clamp(14px,1.28vw,22px); }
+    .report-sheet header span { color:#718997; font-size:clamp(8px,.68vw,12px); font-weight:750; }
+    .report-facts { display:grid; grid-template-columns:repeat(3,1fr); gap:4%; align-items:center; }
+    .report-fact strong { display:block; color:var(--accent); font-size:clamp(28px,3.4vw,58px); line-height:.9; }
+    .report-fact span { display:block; margin-top:11%; color:#5f7888; font-size:clamp(9px,.76vw,13px); font-weight:750; }
+
+    .field-layout { display:grid; grid-template-columns:.38fr 1.62fr; gap:3.5%; height:62%; }
+    .field-score { display:flex; flex-direction:column; justify-content:center; border-top:7px solid #168f95; border-bottom:1px solid #bcd6d8; }
+    .field-score .big { color:#168f95; font-size:clamp(82px,10vw,170px); font-weight:950; line-height:.8; letter-spacing:-.07em; }
+    .field-score h3 { margin-top:11%; }
+    .field-score p { margin-top:5%; color:var(--muted); font-size:clamp(10px,.86vw,15px); }
+    .field-grid { display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:10px; }
+    .field-node { position:relative; padding:10%; border:1px solid #cfdee6; background:rgba(255,255,255,.62); overflow:hidden; }
+    .field-node::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent); }
+    .field-node strong { display:block; font-size:clamp(11px,1vw,17px); }
+    .field-node span { display:block; margin-top:8%; color:var(--muted); font-size:clamp(8px,.68vw,12px); font-weight:700; line-height:1.45; }
+    .field-node::after { content:attr(data-note); position:absolute; left:10%; bottom:10%; color:#8aa0ae; font-size:clamp(8px,.62vw,11px); font-weight:750; }
+    .field-node em { position:absolute; right:8%; bottom:8%; color:var(--accent); font-size:clamp(14px,1.4vw,24px); font-style:normal; font-weight:900; opacity:.22; }
+
+    .composition { height:66%; margin-top:.5%; display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(2,1fr); border:1px solid #cbdbe4; background:#cbdbe4; gap:1px; }
+    .composition-cell { position:relative; padding:7% 8%; background:var(--paper); display:flex; flex-direction:column; justify-content:center; }
+    .composition-cell::before { content:""; position:absolute; left:0; top:0; width:7px; height:100%; background:var(--accent); }
+    .composition-cell .layer-key { color:var(--accent); font-size:clamp(9px,.74vw,13px); font-weight:900; letter-spacing:.12em; }
+    .composition-cell h3 { margin-top:4%; }
+    .composition-cell p { margin-top:4%; color:var(--muted); font-size:clamp(10px,.87vw,15px); }
+    .composition-center { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(45deg); width:96px; aspect-ratio:1; background:var(--navy-900); border:7px solid var(--paper); display:grid; place-items:center; z-index:2; }
+    .composition-center span { transform:rotate(-45deg); color:white; text-align:center; font-size:clamp(10px,.8vw,14px); font-weight:900; line-height:1.25; }
+
+    .closing { grid-template-columns:1.32fr .68fr; }
+    .closing-copy { gap:22px; }
+    .closing h1 { font-size:clamp(38px,5vw,84px); }
+    .closing-action { margin-top:1%; display:flex; align-items:center; gap:18px; width:max-content; padding:14px 18px; border-left:5px solid var(--orange); background:rgba(255,255,255,.06); }
+    .closing-action strong { color:#ffd9b6; font-size:clamp(11px,1vw,17px); }
+    .closing-action span { color:#b7ced8; font-size:clamp(10px,.86vw,15px); }
+    .closing-spine { position:relative; height:64%; display:grid; grid-template-rows:repeat(4,1fr); gap:13px; align-self:center; }
+    .closing-spine::before { content:""; position:absolute; left:21px; top:12%; bottom:12%; width:2px; background:linear-gradient(var(--blue),var(--purple),var(--cyan),var(--orange)); }
+    .spine-mark { position:relative; margin-left:58px; display:flex; flex-direction:column; justify-content:center; }
+    .spine-mark::before { content:""; position:absolute; left:-48px; width:22px; height:22px; border-radius:50%; background:var(--accent); border:4px solid rgba(255,255,255,.82); }
+    .spine-mark strong { font-size:clamp(15px,1.4vw,24px); }
+    .spine-mark span { color:#9ebac7; font-size:clamp(9px,.76vw,13px); margin-top:3px; }
+    .closing-steps { position:absolute; left:6.3%; right:6.3%; bottom:6.5%; display:flex; gap:3%; color:#91aebb; font-size:clamp(8px,.68vw,12px); font-weight:750; }
+    .closing-steps span { display:flex; align-items:center; gap:8px; }
+    .closing-steps i { width:20px; height:2px; background:var(--cyan); opacity:.7; }
+
+    .nav { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); display:flex; align-items:center; gap:10px; z-index:10; }
+    .nav button { width:38px; height:38px; border:1px solid rgba(255,255,255,.18); border-radius:50%; background:rgba(5,17,27,.82); color:white; cursor:pointer; backdrop-filter:blur(12px); }
+    .nav button:hover { background:#17445d; }
+    .counter { min-width:74px; text-align:center; color:#b6cbd6; font-size:13px; font-weight:700; }
+    .progress { position:fixed; left:0; top:0; height:4px; width:0; background:linear-gradient(90deg,var(--cyan),var(--blue),var(--orange)); z-index:20; transition:width .32s ease; }
+    .hint { position:fixed; right:18px; bottom:68px; color:rgba(255,255,255,.42); font-size:11px; font-weight:700; z-index:10; }
+    .fullscreen { position:fixed; right:18px; top:16px; width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.16); background:rgba(5,17,27,.7); color:white; cursor:pointer; z-index:10; }
+
+    .active .reveal { animation:rise .6s cubic-bezier(.2,.75,.25,1) both; }
+    .active .reveal:nth-child(2){animation-delay:.06s}.active .reveal:nth-child(3){animation-delay:.12s}.active .reveal:nth-child(4){animation-delay:.18s}
+    @keyframes rise { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:none} }
+
+    @media (max-width:760px) {
+      .slide { padding:6.5% 5.2%; }
+      .footer { left:5.2%; right:5.2%; }
+      .nav { bottom:10px; }
+      .hint { display:none; }
+    }
+
+    @media print {
+      html, body { overflow:visible; background:white; }
+      .stage { display:block; position:static; background:white; }
+      .deck { width:13.333in; height:auto; overflow:visible; box-shadow:none; }
+      .slide { position:relative; width:13.333in; height:7.5in; opacity:1; visibility:visible; transform:none; page-break-after:always; }
+      .nav,.progress,.hint,.fullscreen { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <button class="fullscreen" id="fullscreen" aria-label="全屏">⛶</button>
+  <main class="stage">
+    <div class="deck" id="deck">
+
+      <section class="slide dark cover active" data-title="封面">
+        <div class="cover-copy">
+          <div class="brand-lock reveal">
+            <strong>须臾</strong><span>云计算 + AI</span>
+            <div class="brand-bars"><i style="--bar:#4a9eee"></i><i style="--bar:#b77bec"></i><i style="--bar:#4bd2c9"></i><i style="--bar:#f59a48"></i></div>
+          </div>
+          <h1 class="reveal">产业数字化<br/><span>与 AI 服务体系</span></h1>
+          <p class="subtitle reveal">用云连接业务与现场，让 AI 理解数据、调用工具并推动行动</p>
+          <div class="accent-line reveal"></div>
+        </div>
+        <div class="cover-rail reveal">
+          <div class="rail-item"><strong>AI</strong><small>理解业务 · 调用工具 · 推动行动</small></div>
+          <div class="rail-item"><strong>SaaS</strong><small>承载业务流程</small></div>
+          <div class="rail-item"><strong>PaaS</strong><small>提供工具与治理</small></div>
+          <div class="rail-item"><strong>Edge</strong><small>连接现场数据</small></div>
+        </div>
+        <div class="footer"><span>须臾 · 云计算 + AI</span><span>2026.08</span></div>
+      </section>
+
+      <section class="slide light scope-slide" data-title="业务范围">
+        <div class="topline"><div class="section-head"><div class="kicker">AI-CENTERED STACK</div><h2>AI 不是附加功能，而是贯穿业务与现场的智能层</h2><p class="subtitle">SaaS 承载流程，PaaS 提供工具与治理，Edge 连接现场，AI 把它们组织成可执行的业务能力。</p></div><div class="page-no">02</div></div>
+        <div class="capability-stack reveal">
+          <article class="stack-layer ai-core" style="--accent:#18a88e;--surface:#e5f7f1;--offset:0%"><div class="stack-name"><strong>Data &amp; AI</strong><span>数据与人工智能</span></div><p>理解业务上下文，调用数据与工具，生成报告、预警和行动建议。</p><span class="stack-outcome">贯穿全部能力</span></article>
+          <article class="stack-layer" style="--accent:#1d78cd;--surface:#eaf2fb;--offset:1.6%"><div class="stack-name"><strong>SaaS</strong><span>软件即服务</span></div><p>覆盖销售、交易、供应链、仓储、制造和经营管理。</p><span class="stack-outcome">提供业务场景</span></article>
+          <article class="stack-layer" style="--accent:#665bd8;--surface:#efedfb;--offset:3.2%"><div class="stack-name"><strong>PaaS</strong><span>平台即服务</span></div><p>把权限、流程、主数据、接口与业务工具沉淀为可复用底座。</p><span class="stack-outcome">支撑 AI 调用</span></article>
+          <article class="stack-layer" style="--accent:#e9822b;--surface:#fff1e4;--offset:4.8%"><div class="stack-name"><strong>Edge</strong><span>现场连接</span></div><p>连接生产系统、PLC、仪表、打印、视频和 IoT 设备。</p><span class="stack-outcome">能力落到现场</span></article>
+        </div>
+        <div class="footer"><span>AI × SaaS × PaaS × Edge</span><span>02 / 12</span></div>
+      </section>
+
+      <section class="slide light" data-title="SaaS 业务链路">
+        <div class="topline"><div class="section-head"><div class="kicker">SAAS + AI</div><h2>业务在线只是开始，AI 让整条链开始主动工作</h2><p class="subtitle">从销售与交易，到供应链、生产和经营分析，AI 在同一份业务上下文中持续理解与判断。</p></div><div class="page-no">03</div></div>
+        <div class="process reveal">
+          <article class="process-step"><div class="num">01</div><h3>销售</h3><p>线索、商品、商机与合同</p></article>
+          <article class="process-step"><div class="num">02</div><h3>交易</h3><p>报价、订单、价格与结算</p></article>
+          <article class="process-step"><div class="num">03</div><h3>供应链</h3><p>采购、仓储、物流与追溯</p></article>
+          <article class="process-step"><div class="num">04</div><h3>制造</h3><p>计划、排产、工单与报工</p></article>
+          <article class="process-step"><div class="num">05</div><h3>质量成本</h3><p>质量、设备、能耗与成本</p></article>
+          <article class="process-step"><div class="num">06</div><h3>经营</h3><p>指标、分析、预警与报告</p></article>
+        </div>
+        <div class="ai-throughline reveal"><strong>AI 贯穿</strong><span>理解业务意图 · 辅助报价 · 识别供应风险 · 分析排产 · 发现成本异常 · 生成经营报告</span><em>DATA → DECISION → ACTION</em></div>
+        <div class="footer"><span>SaaS 提供业务现场，AI 把数据转成判断与行动</span><span>03 / 12</span></div>
+      </section>
+
+      <section class="slide light" data-title="PaaS 行业底座">
+        <div class="topline"><div class="section-head"><div class="kicker">AI-READY PAAS</div><h2>AI 要真正进入业务，先要有可调用的行业底座</h2><p class="subtitle">把业务能力工具化，把数据口径标准化，把权限与流程前置，AI 才能安全、稳定地完成工作。</p></div><div class="page-no">04</div></div>
+        <div class="platform-map reveal">
+          <div class="hub">
+            <div class="orbit"></div><div class="hub-center">AI-ready<br/>PaaS</div>
+            <div class="orbit-item oi1">多租户 · 权限</div><div class="orbit-item oi2">流程 · 消息 · 任务</div><div class="orbit-item oi3">主数据 · 指标 · 知识</div><div class="orbit-item oi4">API · MCP · 安全</div>
+          </div>
+          <div class="benefits">
+            <div class="benefit"><div class="big">可调用</div><div><h3>业务能力变成工具</h3><p>查询、计算、报告和任务都能被 AI 按需调用。</p></div></div>
+            <div class="benefit"><div class="big">可控制</div><div><h3>权限与口径先于模型</h3><p>角色、数据边界和业务规则在执行前就被约束。</p></div></div>
+            <div class="benefit"><div class="big">可复用</div><div><h3>智能能力跨产品组合</h3><p>同一底座可服务 SaaS、专属环境与工厂现场。</p></div></div>
+          </div>
+        </div>
+        <div class="footer"><span>PaaS 决定 AI 能否从演示走向稳定交付</span><span>04 / 12</span></div>
+      </section>
+
+      <section class="slide dark" data-title="AI 工作闭环">
+        <div class="topline"><div class="section-head"><div class="kicker">AI OPERATING LOOP</div><h2>AI 的价值，是完成“理解—调用—判断—行动”</h2><p class="subtitle">项目中的 AI 已经开始处理真实内容、调用真实工具，并把结果交回业务流程。</p></div><div class="page-no">05</div></div>
+        <div class="data-pipeline reveal">
+          <article class="pipe-stage" style="--accent:#247fc2"><div class="pipe-node"><svg viewBox="0 0 32 32"><ellipse cx="16" cy="7" rx="9" ry="4"/><path d="M7 7v9c0 2 4 4 9 4s9-2 9-4V7M7 16v9c0 2 4 4 9 4s9-2 9-4v-9"/></svg></div><h3>感知业务</h3><p>对话、图片、文档、业务系统与现场数据</p></article>
+          <article class="pipe-stage" style="--accent:#665bd8"><div class="pipe-node"><svg viewBox="0 0 32 32"><path d="M8 10h16M8 16h16M8 22h10"/><circle cx="6" cy="10" r="1"/><circle cx="6" cy="16" r="1"/><circle cx="6" cy="22" r="1"/></svg></div><h3>理解上下文</h3><p>主数据、指标、知识、业务口径与会话记忆</p></article>
+          <article class="pipe-stage" style="--accent:#18a88e"><div class="pipe-node"><svg viewBox="0 0 32 32"><path d="M6 24l6-7 5 3 8-11"/><path d="M21 9h4v4"/></svg></div><h3>调用业务工具</h3><p>库存、订单、成本、排产、设备、内容与报告</p></article>
+          <article class="pipe-stage" style="--accent:#e9822b"><div class="pipe-node"><svg viewBox="0 0 32 32"><path d="M9 5h10l5 5v17H9z"/><path d="M19 5v6h5M13 17h7M13 22h7"/></svg></div><h3>推动业务行动</h3><p>形成报告、预警、结构化结果和后续任务</p></article>
+        </div>
+        <div class="pipeline-result reveal"><strong>已落地场景</strong><span>经营分析 · 视觉单据识别 · 站点与内容生成 · 询盘评估 · 消息分类</span><em>PERCEIVE → REASON → ACT</em></div>
+        <div class="footer"><span>AI 进入业务，不止进入对话框</span><span>05 / 12</span></div>
+      </section>
+
+      <section class="slide dark" data-title="统一技术架构">
+        <div class="topline"><div class="section-head"><div class="kicker">TECHNICAL ARCHITECTURE · 全域互联与统一管理</div><h2>以跨云大内网连接全部能力，形成统一管理</h2><p class="subtitle">云资源、业务服务和现场节点通过受控覆盖网络互联，由统一平台管理身份、服务、数据、AI 与运行状态。</p></div><div class="page-no">06</div></div>
+        <div class="network-architecture reveal">
+          <div class="pyramid-stack" aria-label="统一技术架构金字塔">
+            <div class="pyramid-layer"><span>CONTROL</span><h3>统一管理中心</h3><p>身份 · 权限 · 配置 · 发布 · 日志 · 监控</p></div>
+            <div class="pyramid-layer"><span>DATA &amp; AI</span><h3>数据与 AI 平台</h3><p>数据服务 · 模型接入 · 工具编排 · 知识与上下文</p></div>
+            <div class="pyramid-layer"><span>BUSINESS &amp; EDGE</span><h3>业务服务与现场执行</h3><p>SaaS 应用 · 行业服务 · API / MCP · 消息 · 任务 · 设备接入</p></div>
+            <div class="pyramid-layer"><span>PRIVATE NETWORK</span><h3>跨云覆盖网络</h3><p>VPN · 安全隧道 · 服务网关 · 分区路由 · 访问控制</p></div>
+          </div>
+          <aside class="network-control">
+            <span class="control-key">ONE LOGICAL INTRANET</span>
+            <h3>一张逻辑大内网</h3>
+            <p>跨云连接、分区隔离、统一入口，在保持边界的同时集中纳管。</p>
+            <div class="control-list"><span>跨云互联</span><span>分区隔离</span><span>统一入口</span><span>统一观测</span></div>
+          </aside>
+        </div>
+        <div class="network-principle reveal"><strong>一个控制面</strong><span>统一身份、统一策略、统一配置、统一监控</span><em>CONNECT · CONTROL · OBSERVE</em></div>
+        <div class="footer"><span>一张网连接全域，一个控制面统一管理</span><span>06 / 12</span></div>
+      </section>
+
+      <section class="slide light" data-title="AI 能力形态">
+        <div class="topline"><div class="section-head"><div class="kicker">AI FLEXIBILITY · 灵活组合</div><h2>AI 不是一个固定产品，而是一种可组合的业务能力</h2><p class="subtitle">同一套智能底座，可以围绕不同角色、数据、工具和场景形成完全不同的使用方式。</p></div><div class="page-no">07</div></div>
+        <div class="field-layout reveal">
+          <div class="field-score"><div class="big">AI</div><h3>能力随业务组合</h3><p>不是让业务适应模型，而是让 AI 适应业务。</p></div>
+          <div class="field-grid">
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#d87424"><strong>业务助手</strong><span>问答、检索与决策建议</span><em>01</em></div>
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#1d78cd"><strong>数据分析</strong><span>取数、计算与趋势发现</span><em>02</em></div>
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#4a9eee"><strong>视觉识别</strong><span>图片、单据与文档结构化</span><em>03</em></div>
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#18a88e"><strong>内容生成</strong><span>站点、文档与经营内容</span><em>04</em></div>
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#e9822b"><strong>经营报告</strong><span>汇总业务并形成判断</span><em>05</em></div>
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#e9822b"><strong>流程自动化</strong><span>跨步骤推动任务完成</span><em>06</em></div>
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#665bd8"><strong>现场协同</strong><span>连接系统、人员与设备</span><em>07</em></div>
+            <div class="field-node" data-note="按需组合 · 随场景变化" style="--accent:#168f95"><strong>专属智能</strong><span>继承企业知识与业务语境</span><em>08</em></div>
+          </div>
+        </div>
+        <div class="value-banner reveal"><strong>灵活来自组合</strong><span>模型可替换、上下文可配置、工具可扩展、流程可编排。</span><em>ONE CORE · MANY FORMS</em></div>
+        <div class="footer"><span>一种智能底座，多种业务形态</span><span>07 / 12</span></div>
+      </section>
+
+      <section class="slide light success-slide" data-title="从 Copilot 到 Workflow">
+        <div class="topline"><div class="section-head"><div class="kicker">AI OPERATING MODES · 从辅助到执行</div><h2>同一份 AI 能力，可以从 Copilot 走向 Agent 与 Workflow</h2><p class="subtitle">根据业务复杂度和风险逐级选择：先理解与建议，再调用工具，最终编排持续任务。</p></div><div class="page-no">08</div></div>
+        <div class="evidence-grid reveal">
+          <div class="story-rail">
+            <article class="story-point" data-step="01" style="--accent:#d87424"><h3>Copilot · 辅助</h3><p>理解上下文，完成问答、建议、生成和分析。</p></article>
+            <article class="story-point" data-step="02" style="--accent:#247fc2"><h3>Agent · 执行</h3><p>选择并调用业务工具，在权限范围内完成任务。</p></article>
+            <article class="story-point" data-step="03" style="--accent:#168f95"><h3>Workflow · 编排</h3><p>跨系统组织多个步骤，让复杂任务持续运行。</p></article>
+          </div>
+          <div class="product-evidence">
+            <div class="product-shot mode-proof"><span><i>CHANNEL</i><strong>多种入口</strong></span><span><i>CONTEXT</i><strong>动态上下文</strong></span><span><i>TOOLS</i><strong>业务工具</strong></span><span><i>GUARDRAILS</i><strong>权限与审批</strong></span></div>
+            <div class="evidence-metrics">
+              <div class="evidence-metric"><strong>辅助</strong><span>人在环路中获得建议</span></div>
+              <div class="evidence-metric"><strong>分析</strong><span>理解数据并形成判断</span></div>
+              <div class="evidence-metric"><strong>执行</strong><span>调用工具完成动作</span></div>
+              <div class="evidence-metric"><strong>编排</strong><span>组织多步持续任务</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>ASSIST → ANALYZE → ACT → ORCHESTRATE</span><span>08 / 12</span></div>
+      </section>
+
+      <section class="slide dark" data-title="AI 理解与挖掘数据">
+        <div class="topline"><div class="section-head"><div class="kicker">DATA INTELLIGENCE · 从原始数据到业务上下文</div><h2>AI 先理解数据，再发现关系与机会</h2><p class="subtitle">AI 参与识别、清洗、语义映射和关联分析，让分散的数据逐步成为可使用的业务上下文。</p></div><div class="page-no">09</div></div>
+        <div class="analysis-case reveal">
+          <div class="cost-proof"><div class="proof-value">数据</div><h3>把取数变成理解与挖掘</h3><p>连接结构化业务表、文档、图片和对话，补充业务语义与关系。</p><div class="source-line"><i></i>识别 · 清洗 · 关联 · 挖掘</div></div>
+          <div class="report-evidence">
+            <div class="integration-line"><span>原始数据</span><b>→</b><span>AI 语义治理</span><b>→</b><span>业务洞察</span></div>
+            <div class="report-sheet">
+              <header><strong>从数据到可用判断</strong><span>数据边界与权限始终受控</span></header>
+              <div class="report-facts">
+                <div class="report-fact" style="--accent:#247fc2"><strong>理解</strong><span>识别实体、字段与口径</span></div>
+                <div class="report-fact" style="--accent:#18a88e"><strong>整理</strong><span>清洗、归类与结构化</span></div>
+                <div class="report-fact" style="--accent:#665bd8"><strong>挖掘</strong><span>发现关联、趋势与异常</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>数据不只被查询，也开始被理解</span><span>09 / 12</span></div>
+      </section>
+
+      <section class="slide light" data-title="AI 任务编排">
+        <div class="topline"><div class="section-head"><div class="kicker">AI ORCHESTRATION · 从回答到持续执行</div><h2>AI 可以按目标组织多个工具与步骤</h2><p class="subtitle">面对复杂任务，系统能够拆解目标、选择能力、维护状态，并在关键节点交给人确认。</p></div><div class="page-no">10</div></div>
+        <div class="field-layout reveal">
+          <div class="field-score"><div class="big">编排</div><h3>从一次回答到持续执行</h3><p>模型负责理解与判断，系统负责组织、控制和推进。</p></div>
+          <div class="field-grid">
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#d87424"><strong>目标理解</strong><span>识别约束、结果与优先级</span><em>01</em></div>
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#1d78cd"><strong>任务拆解</strong><span>把复杂目标分成可执行步骤</span><em>02</em></div>
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#4a9eee"><strong>上下文装配</strong><span>按任务加载数据、知识与规则</span><em>03</em></div>
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#18a88e"><strong>工具选择</strong><span>为每一步匹配合适能力</span><em>04</em></div>
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#e9822b"><strong>并行执行</strong><span>协调多个任务与执行单元</span><em>05</em></div>
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#e9822b"><strong>状态记忆</strong><span>记录过程、结果与下一步</span><em>06</em></div>
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#665bd8"><strong>人工审批</strong><span>高风险动作保留人工确认</span><em>07</em></div>
+            <div class="field-node" data-note="目标驱动 · 动态调整" style="--accent:#168f95"><strong>结果回流</strong><span>让输出继续进入业务流程</span><em>08</em></div>
+          </div>
+        </div>
+        <div class="value-banner reveal"><strong>编排价值</strong><span>把 AI 从单次能力，升级为可持续运行、可管理的业务系统。</span><em>GOAL → PLAN → ACT</em></div>
+        <div class="footer"><span>可拆分 · 可组合 · 可审批 · 可追踪</span><span>10 / 12</span></div>
+      </section>
+
+      <section class="slide light" data-title="核心竞争力">
+        <div class="topline"><div class="section-head"><div class="kicker">WHY AI WORKS HERE</div><h2>不是接入 AI，而是让 AI 真正进入产业流程</h2><p class="subtitle">它同时拥有行业上下文、可调用工具、数据治理与真实现场，因而能够从回答走向执行。</p></div><div class="page-no">11</div></div>
+        <div class="composition reveal">
+          <article class="composition-cell" style="--accent:#1d78cd"><span class="layer-key">BUSINESS · 行业上下文</span><h3>懂真实业务语义</h3><p>理解订单、库存、工艺、成本、业务协作与经营指标之间的关系。</p></article>
+          <article class="composition-cell" style="--accent:#665bd8"><span class="layer-key">PAAS · 工具编排</span><h3>不只回答，也能调用能力</h3><p>通过业务工具与 MCP 完成查询、计算、内容生成、报告与任务编排。</p></article>
+          <article class="composition-cell" style="--accent:#18a88e"><span class="layer-key">DATA · 可控判断</span><h3>每个结论都有数据与口径</h3><p>把权限、受控访问、业务知识和可追溯结果放在模型之前。</p></article>
+          <article class="composition-cell" style="--accent:#e9822b"><span class="layer-key">CLOUD &amp; EDGE · 真实现场</span><h3>从云端延伸到工厂现场</h3><p>同时服务公有云、专属环境、制造系统与现场设备。</p></article>
+          <div class="composition-center"><span>AI 进入<br/>业务</span></div>
+        </div>
+        <div class="footer"><span>懂业务 · 会调用 · 可控制 · 能落地</span><span>11 / 12</span></div>
+      </section>
+
+      <section class="slide dark closing" data-title="价值愿景">
+        <div class="closing-copy">
+          <div class="kicker reveal">OUR VISION</div>
+          <h1 class="reveal">让每一家实体企业<br/>都拥有自己的 AI 能力</h1>
+          <p class="subtitle reveal">云计算连接业务与现场，AI 把数据、经验和行动沉淀为企业长期能力。</p>
+          <div class="closing-action reveal"><strong>长期价值</strong><span>让智能不止解决一次问题，而是随着企业运行持续积累与进化</span></div>
+        </div>
+        <div class="closing-spine reveal">
+          <div class="spine-mark" style="--accent:#4a9eee"><strong>Connect</strong><span>连接业务数据与现场</span></div>
+          <div class="spine-mark" style="--accent:#b77bec"><strong>Understand</strong><span>建立行业上下文与口径</span></div>
+          <div class="spine-mark" style="--accent:#4bd2c9"><strong>Act</strong><span>让 AI 调用工具完成工作</span></div>
+          <div class="spine-mark" style="--accent:#f59a48"><strong>Learn</strong><span>把结果沉淀为企业能力</span></div>
+        </div>
+        <div class="closing-steps reveal"><span><i></i>连接数据</span><span><i></i>建立口径</span><span><i></i>AI 调用工具</span><span><i></i>结果进入业务</span></div>
+        <div class="footer"><span>须臾 · 云计算 + AI</span><span>12 / 12</span></div>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="nav" aria-label="幻灯片导航">
+    <button id="prev" aria-label="上一页">←</button>
+    <div class="counter"><span id="current">1</span> / <span id="total">12</span></div>
+    <button id="next" aria-label="下一页">→</button>
+  </div>
+  <div class="hint">← → / Space 翻页 · F 全屏</div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const currentEl = document.getElementById('current');
+    const totalEl = document.getElementById('total');
+    const progress = document.getElementById('progress');
+    totalEl.textContent = slides.length;
+    let index = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1) || 1) - 1));
+
+    function show(nextIndex, updateHash = true) {
+      index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      currentEl.textContent = index + 1;
+      progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+      document.title = `${index + 1}/${slides.length} · ${slides[index].dataset.title}｜须臾产业数字化服务体系`;
+      if (updateHash) history.replaceState(null, '', `#${index + 1}`);
+    }
+
+    function next() { show(index + 1); }
+    function prev() { show(index - 1); }
+    document.getElementById('next').addEventListener('click', next);
+    document.getElementById('prev').addEventListener('click', prev);
+    document.addEventListener('keydown', (event) => {
+      if (['ArrowRight','PageDown',' '].includes(event.key)) { event.preventDefault(); next(); }
+      if (['ArrowLeft','PageUp'].includes(event.key)) { event.preventDefault(); prev(); }
+      if (event.key === 'Home') show(0);
+      if (event.key === 'End') show(slides.length - 1);
+      if (event.key.toLowerCase() === 'f') document.documentElement.requestFullscreen?.();
+    });
+    document.getElementById('fullscreen').addEventListener('click', () => document.documentElement.requestFullscreen?.());
+    let touchStart = 0;
+    document.addEventListener('touchstart', event => touchStart = event.changedTouches[0].screenX, { passive:true });
+    document.addEventListener('touchend', event => {
+      const delta = event.changedTouches[0].screenX - touchStart;
+      if (Math.abs(delta) > 50) delta < 0 ? next() : prev();
+    }, { passive:true });
+    window.addEventListener('hashchange', () => show(Number(location.hash.slice(1) || 1) - 1, false));
+    show(index, false);
+  </script>
+</body>
+</html>

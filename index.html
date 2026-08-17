@@ -427,11 +427,11 @@
     .report-fact strong { display:block; color:var(--accent); font-size:clamp(28px,3.4vw,58px); line-height:.9; }
     .report-fact span { display:block; margin-top:11%; color:#5f7888; font-size:clamp(9px,.76vw,13px); font-weight:750; }
 
-    .field-layout { display:grid; grid-template-columns:.38fr 1.62fr; gap:3.5%; height:62%; }
-    .field-score { display:flex; flex-direction:column; justify-content:center; border-top:7px solid #168f95; border-bottom:1px solid #bcd6d8; }
-    .field-score .big { color:#168f95; font-size:clamp(82px,10vw,170px); font-weight:950; line-height:.8; letter-spacing:-.07em; }
-    .field-score h3 { margin-top:11%; }
-    .field-score p { margin-top:5%; color:var(--muted); font-size:clamp(10px,.86vw,15px); }
+    .field-layout { display:grid; grid-template-columns:.48fr 1.52fr; gap:3.5%; height:62%; }
+    .field-score { display:flex; flex-direction:column; justify-content:center; padding-right:8%; border-top:7px solid #168f95; border-bottom:1px solid #bcd6d8; }
+    .field-score .field-label { color:#168f95; font-size:clamp(9px,.78vw,14px); font-weight:900; letter-spacing:.12em; }
+    .field-score h3 { margin-top:9%; font-size:clamp(23px,2.15vw,38px); line-height:1.16; }
+    .field-score p { margin-top:8%; color:var(--muted); font-size:clamp(10px,.86vw,15px); }
     .field-grid { display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:10px; }
     .field-node { position:relative; padding:10%; border:1px solid #cfdee6; background:rgba(255,255,255,.62); overflow:hidden; }
     .field-node::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent); }
@@ -655,10 +655,10 @@
         <div class="footer"><span>分区 · 闸门 · 人确认，比“统一一切”更可信</span><span>11 / 14</span></div>
       </section>
 
-      <section class="slide light" data-title="接入现有生意">
-        <div class="topline"><div class="section-head"><div class="kicker">NO RIP-AND-REPLACE · 不推倒重来</div><h2>接在你已经在跑的系统上，而不是换一套宇宙</h2><p class="subtitle">云计算让现场与业务可达，AI 只通过闸门使用已有数据和工具；主业务可以继续在原处运行。</p></div><div class="page-no">12</div></div>
+      <section class="slide light" data-title="接入现有系统">
+        <div class="topline"><div class="section-head"><div class="kicker">INTEGRATION · 接入原则</div><h2>沿现有系统接入，不替换主业务</h2><p class="subtitle">云计算让现场与业务可达，AI 只通过闸门使用已有数据和工具；主业务继续在原处运行。</p></div><div class="page-no">12</div></div>
         <div class="field-layout reveal">
-          <div class="field-score"><div class="big">接</div><h3>沿现有业务开路</h3><p>不要求先统一所有身份、主数据和监控，再开始创造价值。</p></div>
+          <div class="field-score"><span class="field-label">接入原则</span><h3>主业务留在原处</h3><p>沿现有系统开通数据与业务工具，不要求先统一全部身份、主数据和监控。</p></div>
           <div class="field-grid four-up">
             <div class="field-node" data-note="从正在运行的系统出发" style="--accent:#1d78cd"><strong>有真实业务可接</strong><span>设备、单据、库存与交易，本来就在企业里运行。</span><em>01</em></div>
             <div class="field-node" data-note="不是只有聊天" style="--accent:#18a88e"><strong>有真实动作可调</strong><span>查询、计算、报告与固定技能提交，回到现有流程。</span><em>02</em></div>
@@ -666,8 +666,8 @@
             <div class="field-node" data-note="沿用熟悉的确认方式" style="--accent:#e9822b"><strong>有人握住关键动作</strong><span>写入停在确认队列，授权人点头后才继续。</span><em>04</em></div>
           </div>
         </div>
-        <div class="value-banner reveal"><strong>诚实边界</strong><span>不声称已经统一所有系统；从今天就能沿现有生意开一条受控通路。</span><em>CONNECT WHAT RUNS</em></div>
-        <div class="footer"><span>不换平台，先让一条高价值链路开始积累</span><span>12 / 14</span></div>
+        <div class="value-banner reveal"><strong>接入边界</strong><span>不声称已经统一所有系统；从现有系统中开通一条受控业务链路。</span><em>沿现有系统接入</em></div>
+        <div class="footer"><span>主业务留在原处，数据与工具按需接入</span><span>12 / 14</span></div>
       </section>
 
       <section class="slide light" data-title="企业会留下什么">
